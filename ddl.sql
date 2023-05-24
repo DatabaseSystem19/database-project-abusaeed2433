@@ -27,7 +27,7 @@ create table time_schedule(
 	ts_midnight integer,
 	timestamp_utc integer,
 	message_time varchar(20),
-	message varchar(200),
+	message varchar(50), --change to 200 later
 	upload_time varchar(20),
 	is_completed integer,
 	event_date varchar(10),
@@ -39,7 +39,7 @@ create table time_schedule(
 create table notification(
 	timestamp_utc integer,
 	user_id varchar(50),
-	message_new varchar(200),
+	message_new varchar(50), --change to 200 later
 	message_time varchar(20),
 	is_completed integer,
 	foreign key(user_id) references user_table(user_id),
