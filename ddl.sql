@@ -32,17 +32,23 @@ create table time_schedule(
 	is_completed integer,
 	event_date varchar(10),
 	foreign key(event_date) references day_schedule(event_date),
-	primary key(timestamp_utc)
+	primary key(timestamp_utc),
+	CONSTRAINT check_mid_utc CHECK (
+        is_completed in(0,1)  and
+        ( timestamp_utc > 0 ) and
+        ( ts_midnight > 0 )
+    )
 );
 
 -- on server
 create table notification(
-	timestamp_utc integer,
+	timestamp_utc integer CHECK (timestamp_utc > 0),
 	user_id varchar(50),
 	message_new varchar(50), --change to 200 later
 	message_time varchar(20),
-	is_completed integer,
+	is_completed integer CHECK (is_completed IN (0,1)),
 	foreign key(user_id) references user_table(user_id),
-	foreign key(timestamp_utc) references time_schedule(timestamp_utc),
+	foreign key(timestamp_utc) references time_schedule(timestamp_utc)
+	on delete cascade,
 	primary key(user_id,timestamp_utc)
 );

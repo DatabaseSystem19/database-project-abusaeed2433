@@ -14,10 +14,10 @@ insert into user_table values('c12E5iZ8o7O9MuEqW2BniUShRFq4','Mary','mary101@gma
 
 insert into user_table values('d13E5iZ8o7O9MuEqW2BniUShRFq5','Peter','peter101@gmail.com','Peter');
 insert into user_table values('e14E5iZ8o7O9MuEqW2BniUShRFq6','Susan','susan101@gmail.com','Susan');
-insert into user_table values('f15E5iZ8o7O9MuEqW2BniUShRFq7','David','david101@gmail.com','David');
+insert into user_table values('vH1E5iZ8o7O9MuEqW2BniUShRFq1','David','david101@gmail.com','David');
     
 insert into user_table values('g16E5iZ8o7O9MuEqW2BniUShRFq8','Michael','michael101@gmail.com','Michael');
-insert into user_table values('h17E5iZ8o7O9MuEqW2BniUShRFq9','Sarah','sarah101@gmail.com','Sarah');
+insert into user_table values('vH1E5iZ8o7O9MuEqW2BniUShRFq4','Sarah','sarah101@gmail.com','Sarah');
 insert into user_table values('i18E5iZ8o7O9MuEqW2BniUShRFq10','James','james101@gmail.com','James');
 
 prompt Inserting into day_schedule
@@ -86,6 +86,13 @@ INSERT INTO notification VALUES (1685349900000, 'vH1E5iZ8o7O9MuEqW2BniUShRFq2', 
 
 INSERT INTO notification VALUES (1685293200000, 'vH1E5iZ8o7O9MuEqW2BniUShRFq2', 'Prepare presentation', '30 Mar at 05:30PM', 1);
 INSERT INTO notification VALUES (1685505600000, 'vH1E5iZ8o7O9MuEqW2BniUShRFq2', 'Client meeting', '31 Mar at 12:20PM', 1);
+
+----
+INSERT INTO notification VALUES (1685505600000, 'vH1E5iZ8o7O9MuEqW2BniUShRFq1', 'Meeting with client', '31 Mar at 12:20PM', 0);
+INSERT INTO notification VALUES (1685349900000, 'vH1E5iZ8o7O9MuEqW2BniUShRFq1', 'Read two book', '01 Apr at 06:30AM', 0);
+INSERT INTO notification VALUES (1685696400000, 'vH1E5iZ8o7O9MuEqW2BniUShRFq1', 'Destroy old technology', '01 Apr at 09:30AM', 0);
+
+INSERT INTO notification VALUES (1685696400000, 'vH1E5iZ8o7O9MuEqW2BniUShRFq4', 'Take a break', '01 Apr at 09:30AM', 0);
 
 
 -- prompt 'Setting pagesize and linesize to 200';

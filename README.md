@@ -144,7 +144,7 @@ create table day_schedule(
 );
 
 create table time_schedule(
-	ts_midnight integer,
+	ts_midnight integer not null,
 	timestamp_utc integer,
 	message_time varchar(10),
 	message varchar(200),
@@ -155,16 +155,23 @@ create table time_schedule(
 	foreign key(user_id) references user_table(user_id),
 	foreign key(event_date) references day_schedule(event_date),
 	primary key(user_id,timestamp_utc)
+    
+    CONSTRAINT check_mid_utc CHECK (
+        ( is_completed in(0,1) ) and
+        (timestamp_utc > 0) and
+        (ts_midnight > 0)
+    )
 );
 
 create table notification(
-	timestamp_utc integer,
+	timestamp_utc integer CHECK (timestamp_utc > 0),
 	user_id varchar(50),
 	message_new varchar(200),
 	message_time varchar(10),
-	is_completed integer,
+	is_completed integer CHECK (is_completed IN (0,1)),
 	foreign key(user_id,timestamp_utc) references time_schedule(user_id,timestamp_utc),	
 	primary key(user_id,timestamp_utc)
+    on delete cascade
 );
 
 ```
@@ -475,9 +482,155 @@ create table notification(
     
     
 
+- ## Set membership operation(and,or,not)
+    ```
+    select 
+        user_id, 
+        message_new 
+    from 
+        notification 
+    where 
+        (
+            user_id = 'vH1E5iZ8o7O9MuEqW2BniUShRFq2' 
+            or user_id = 'vH1E5iZ8o7O9MuEqW2BniUShRFq1'
+        ) 
+        and is_completed = 0;
+    ```
+    > all incomplete schedules of two user
+    
+    <img src="images/and_or.png">
+
+- ## some/all/exists/unique
+    - ### some
+        ```
+        select 
+            event_date, 
+            message 
+        from 
+            time_schedule 
+        where 
+            ts_midnight <= some(
+                select 
+                    ts_midnight 
+                from 
+                    time_schedule 
+                where 
+                    ts_midnight <= 735
+            );
+        ```        
+        > All user's schedules before 12:16PM
+
+        <img src="images/some.png">
+    - ### all
+        ```
+        select 
+            event_date, 
+            message 
+        from 
+            time_schedule 
+        where 
+        ts_midnight <= all(
+            select 
+                ts_midnight 
+            from 
+                time_schedule 
+            where 
+                ts_midnight >= 735
+        );
+        ```        
+        > All user's schedules before 12:16PM
+        
+        <img src="images/all.png">
+    - ### exists
+        ```
+        select 
+                name 
+            from 
+                user_table ut 
+            where 
+                exists(
+                    select 
+                        * 
+                    from 
+                        notification 
+                    where 
+                        user_id = ut.user_id
+        );
+        ```
+        > All user's who has notification
+        
+        <img src="images/exists.png">
 
 
+- ## String operation
+    > percent ( % ). The % character matches any substring
+
+    > underscore ( _ ). The _ character matches any character
+
+    - ### name having length 5
+        ```
+        select name from user_table where name like '_____';
+        ```
+        <img src="images/length_5.png">
+    - ### name ends with h
+        ```
+        select name from user_table where name like '%h';
+        ```
+        <img src="images/end_with_h.png">
+    - ### name containing e
+        ```
+        select name from user_table where name like '%e%';
+        ```
+        <img src="images/contain_e.png">
+- ## Join
+    - ### natural join
+    ```
+    select 
+        user_id, 
+        event_date, 
+        message 
+    from 
+        day_schedule natural 
+        join time_schedule 
+    where 
+        user_id = 'vH1E5iZ8o7O9MuEqW2BniUShRFq2';
+    ```
+    <img src="images/natural_join.png">
+
+    <hr>
+
+    ```
+    select user_id, name, event_date from user_table natural join day_schedule;
+
+    select user_id,name,event_date from user_table join day_schedule using(user_id);
+
+    select ut.user_id,name,event_date from user_table ut join day_schedule ds on ut.user_id = ds.user_id;
+    ```
+    > above 3 query produce same result
+
+    <img src="images/natural_join_2.png">
+
+    - ### Left outer join
+        ```
+        select user_id,name,event_date from user_table left outer join day_schedule using(user_id);
+        ```
+        <img src="images/left_outer_join.png">
+    - ### Right outer join
+        ```
+        select user_id,name,event_date from user_table right outer join day_schedule using(user_id);
+        ```
+        <img src="images/right_outer_join.png">
+    - ### Full outer join
+        ```
+        select user_id,name,event_date from user_table full outer join day_schedule using(user_id);
+        ```
+        <img src="images/full_outer_join.png">
 
 
+- ## Views
 
+<hr>
+<hr>
 
+# PL/SQL
+- ## variable declaration
