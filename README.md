@@ -628,9 +628,303 @@ create table notification(
 
 
 - ## Views
+    > view is a virtual table derived from the result of a query that can be treated a table. Views are useful for  simplifying complex queries.
 
+    - ### Creating view
+        ```
+        create view my_view as select ts_midnight from time_schedule where ts_midnight >= 735;
+        ```
+    - ### using that view
+        ```
+        select event_date, message from time_schedule where ts_midnight <= all(select * from my_view);
+        ```
+
+        <img src="images/all.png">
+    - ### Dropping that view
+        ```
+        drop view my_view;
+        ```    
 <hr>
 <hr>
 
 # PL/SQL
+> Procedural Language extensions to the SQL. Enables developers to combine the power of SQL with procedural statements. Adds many procedural constructs to SQL language to overcome some limitations of SQL. It allows declaration of constants and variables, procedures and functions, types and variable of those types and triggers.
 - ## variable declaration
+    ```
+    set serveroutput on
+    declare
+        name user_table.name%type;
+        uid user_table.user_id%type;
+        email varchar(50);
+    begin
+        select user_id,name,email into uid,name,email from user_table where user_id = 'vH1E5iZ8o7O9MuEqW2BniUShRFq2';
+        dbms_output.put_line('UID: ' || uid || ' Name: ' || name || ' Email: ' || email );
+    end;
+    /
+    ```
+    <img src="images/pl_sql_variable.png">
+
+- ## Set values and insert
+    ```
+    set serveroutput on
+    declare
+        uid USER_TABLE.USER_ID%type := 'abcdef1234';
+        email varchar(30) := 'abutest3456@gmail.com';
+        name varchar(30) := 'A Saeed';
+        password user_table.password%type := '123456';
+    begin
+        delete from user_table where user_id = 'abcdef1234';
+        
+        -- main line of code
+        insert into user_table values(uid,email,name,password);
+
+        select * into uid, name, email, password from user_table where user_id = 'abcdef1234';
+
+        dbms_output.put_line(uid || ' ' || name || ' ' || email || ' ' || password);
+    end;
+    /
+    ```
+    <img src="images/set_and_insert.png">
+- ## RowType
+    > A data type that represents a row in a table.
+    ```
+    set serveroutput on
+    declare
+        my_row user_table%rowtype;
+    begin
+        select * into my_row from user_table where user_id = 'abcdef1234';
+        dbms_output.put_line(my_row.user_id || ' ' || my_row.email);
+    end;
+    /
+    ```
+    <img src="images/row_type.png">
+
+- ## Cursor and Loop
+    > A pointer to a set of rows returned by a SELECT query
+    ```
+    set serveroutput on
+    declare
+        cursor cur is select * from user_table;
+        row user_table%rowtype;
+
+    begin
+        open cur;
+        fetch cur into row;
+        
+        while cur % found loop
+            dbms_output.put_line(row.user_id || ' ' || row.name);
+            fetch cur into row;
+        end loop;
+        
+        close cur;
+    end;
+    /
+    ```
+    <img src="images/cursor_and_loop.png">
+
+- ## Array and for loop
+    - ### Declaring type
+        ```
+        TYPE NAME_ARR IS VARRAY(5) OF user_table.name%type;
+        ```
+        > It defines a user-defined collection type named NAME_ARR as a variable array of 5 elements. where each element is of type name in user_table
+        
+    - ### Creating variable
+        ```
+        arr NAME_ARR := NAME_ARR();
+        ```
+        > above line of code will initialize an array variable whose elements type is same as name of user_table.
+    
+    - ### with extend() function
+        ```
+        set serveroutput on
+        declare
+            type NAME_ARR is VARRAY(5) of user_table.name%type;
+            arr NAME_ARR := NAME_ARR(); 
+            counter number;
+            
+        begin
+            counter := 1;
+            for i in 13..15
+            loop
+                arr.extend();
+                arr(counter) := 'abu ' || i;
+                counter := counter+1;
+            end loop;
+            
+            dbms_output.put_line('------------------------------------------------');
+            
+            counter := 1;
+            while (counter <= arr.count ) 
+            loop
+                dbms_output.put_line(arr(counter));
+                counter := counter+1;
+            end loop;
+            
+        end;
+        /
+        ```
+
+        <img src="images/array_and_for_loop.png">
+
+    - ### without extend() function
+        ```
+        set serveroutput on;
+
+        declare
+            TYPE ID_ARRAY is VARRAY(5) of USER_TABLE.USER_ID % type;
+            
+            uids ID_ARRAY := ID_ARRAY('vH1E5iZ8o7O9MuEqW2BniUShRFq2','c12E5iZ8o7O9MuEqW2BniUShRFq4','g16E5iZ8o7O9MuEqW2BniUShRFq8');
+            
+            uid USER_TABLE.USER_ID%type;
+            name user_table.name%type;
+
+        begin
+            for i in 1..uids.count loop
+                select user_id, name into uid, name from user_table where user_id = uids(i);
+                dbms_output.put_line(uid || ' -> ' || name);
+            end loop;
+        end;
+        /
+        ```
+        <img src="images/array_and_for_loop_without_extend.png">
+    
+    - ### extend() vs without extend()
+        <table>
+            <tr>
+                <td>with</td>
+                <td>without</td>
+            <tr>
+            <tr>
+                <td>increase size dynamically by one</td>
+                <td>size is defined manually</td>
+            <tr>
+
+            <tr>
+                <td>need to extend before adding</td>
+                <td>can assign directly</td>
+            <tr>
+        </table>
+        
+        > In both cases, size of array can't exceed the actual size while defining our array.
+    
+    - ### if / else / elsif
+        ```
+        set serveroutput on;
+        declare
+            TYPE ID_ARRAY is VARRAY(5) of USER_TABLE.USER_ID % type;
+            
+            uids ID_ARRAY := ID_ARRAY('vH1E5iZ8o7O9MuEqW2BniUShRFq2','c12E5iZ8o7O9MuEqW2BniUShRFq4','g16E5iZ8o7O9MuEqW2BniUShRFq8');
+            
+            uid USER_TABLE.USER_ID%type;
+            name user_table.name%type;
+
+        begin
+            for i in 1..uids.count loop
+                select user_id, name into uid, name from user_table where user_id = uids(i);
+                dbms_output.put_line(name);
+                if name = 'Saeed' then
+                    dbms_output.put_line('hello idiot');
+                elsif name = 'Mary' then
+                    dbms_output.put_line('Hello Mary');
+                else
+                    dbms_output.put_line('Who are you?');
+                end if;
+            end loop;
+        end;
+        /
+        ```
+
+        <img src="images/if_else_elsif.png">
+
+    - ### Procedure
+        - Creating procedure
+            ```            
+            create or replace procedure printUserInfo(uid IN varchar, row OUT user_table%rowtype) as
+                tmp varchar(30);
+                begin
+                    select * into row from user_table where user_table.user_id = uid;
+                    
+                    tmp := row.name;
+                    dbms_output.put_line(tmp);
+                end;
+            /
+            ```
+            > after executing..
+
+            <img src="images/procedure_created.png">
+        - Calling procedure
+            ```
+            set serveroutput on
+
+            declare
+                val user_table%rowtype;
+                uid varchar(30) := 'vH1E5iZ8o7O9MuEqW2BniUShRFq2';
+            begin
+                printUserInfo(uid,val);
+                dbms_output.put_line(val.user_id || ' ' || val.name);
+            end;
+            /
+            ```
+            <img src="images/procedure.png">
+        - Drop procedure
+            ```
+            drop procedure printUserInfo;
+            ```
+            > drop procedure procedure_name;
+    
+    - ### Function
+        - Creating function
+            ```            
+            create or replace function getName(uid in varchar) return varchar as
+                name varchar(30);
+                begin
+                    select user_table.name into name from user_table where user_table.user_id = uid;
+                    
+                    dbms_output.put_line('returning ' || name);
+                    return name;
+                end;
+                /
+            ```
+        - Calling function
+          
+            ```
+            set serveroutput on
+
+            declare
+                val varchar(30);
+                uid varchar(30) := 'vH1E5iZ8o7O9MuEqW2BniUShRFq2';
+            begin
+                val := getName(uid);
+                dbms_output.put_line(val);
+            end;
+            /
+            ```
+
+            <img src="images/function.png">
+        - Drop function
+            ```
+            drop function getName;
+            ```
+            > drop function function_name;
+    
+
+    - ### procedure vs function
+        <table>
+            <tr>
+                <td>Procedure</td>
+                <td>Function</td>
+            <tr>
+            <tr>
+                <td>Can't return value</td>
+                <td>Can return value</td>
+            <tr>
+            <tr>
+                <td> 
+                cannot be directly used in SQL statement.
+                </td>
+                <td>Can be used in SQL statements directly</td>
+            <tr>
+        </table>
+<hr>
+
