@@ -272,7 +272,7 @@ create table notification(
     - ### notification -server
     <img src="images/notification_data.png" height="200px">
 
-- ## Read operation
+- ## Read operation ?
     - ### Integrity constraint
     <img src="images/integrity_constraint.png">
     
@@ -320,41 +320,164 @@ create table notification(
 
 - ## Update operation
     - ### Updating user's name
-    > update name of a specified user
-    ```
-    update user_table set name='Md Abu Saeed' where user_id = 'a2E5iZ8o7O9MuEqW2BniUShRFq2';
-    ```
-    <img src="images/update_1.png">
+        > update name of a specified user
+        ```
+        update user_table set name='Md Abu Saeed' where user_id = 'a2E5iZ8o7O9MuEqW2BniUShRFq2';
+        ```
+        <img src="images/update_1.png">
 
 - ## Delete operation
     - ### dummy insert
-    ```
-    insert into day_schedule 
-    values(
-        '27/01/2023',19368,'Saturday','Saeed','23 May at 08:16AM','i18E5iZ8o7O9MuEqW2BniUShRFq10'
-    );
-    ```
-    > 1 row created.
+        ```
+        insert into day_schedule 
+        values(
+            '27/01/2023',19368,'Saturday','Saeed','23 May at 08:16AM','i18E5iZ8o7O9MuEqW2BniUShRFq10'
+        );
+        ```
+        > 1 row created.
 
     - ### deleting added data
-    ```
-    delete from
-        day_schedule
-    where 
-        user_id = 'i18E5iZ8o7O9MuEqW2BniUShRFq10' 
-        and event_date = '27/01/2023';
-    ```
-    > 1 row deleted.
-
-
+        ```
+        delete from
+            day_schedule
+        where 
+            user_id = 'i18E5iZ8o7O9MuEqW2BniUShRFq10' 
+            and event_date = '27/01/2023';
+        ```
+        > 1 row deleted.
 
 
 - ## union, intersect, except
-    - ### union
+    - ### union - all date of thursday and saturday    
+        ```
+        select 
+            event_date,
+            day 
+        from 
+            day_schedule 
+        where 
+            day = 'Thursday' 
+        union 
+        select 
+            event_date, 
+            day 
+        from 
+            day_schedule 
+        where 
+            day = 'Saturday';
+        ```
+        > Both set must have to have same no of column and definition
 
-    - ### intersect
+        <img src="images/union.png">
 
-    - ### except
+    - ### intersect - Show only Saturday
+        ```
+        select 
+            event_date, 
+            day 
+        from 
+            day_schedule 
+        where 
+            day in('Saturday', 'Sunday') 
+        intersect 
+        select 
+            event_date, 
+            day 
+        from 
+            day_schedule
+        where 
+            day = 'Saturday';
+        ```
+        <img src="images/intersect.png">
 
-- ## with clause
+    - ### except - not supported in my db
+        ```
+        select 
+            event_date, 
+            day 
+        from 
+            day_schedule 
+        where 
+            day in('Saturday', 'Sunday') 
+            and event_date not in (
+            select 
+                event_date 
+            from 
+                day_schedule 
+            where 
+                day = 'Sunday'
+        );
+        ```
+        > Except is not supported in all database version
+
+        <img src="images/except.png">
+
+- ## with clause - date & number of schedules at that date
     
+    > allows to give a 'sub-query block' a name
+
+    ```
+    with my_table(n_date,total) as (
+        select 
+            event_date, count(event_date) 
+        from 
+            time_schedule 
+        group by 
+            event_date
+    )
+    select 
+        event_date, 
+        total
+    from 
+        day_schedule , 
+        my_table 
+    where 
+        event_date = n_date;
+    ```
+    <img src="images/with.png">
+
+- ## Saving output to 
+    Not working in my pc
+
+- ## Aggregate function
+    - ### AVG
+        ```
+        select avg(time_in_day) as avg from day_schedule;
+        ```
+    - ### COUNT
+        ```
+        select event_date, count(*) as total from time_schedule group by event_date;
+        ```
+        > shows date with schedule count
+    - ### MAX
+        ```
+        select event_date from time_schedule where timestamp_utc = ( select max(timestamp_utc) from time_schedule);
+        ```
+        > shows last schedule date
+    - ### MIN
+        ```
+        select event_date from time_schedule where timestamp_utc = ( select min(timestamp_utc) from time_schedule);
+        ```
+        > shows first schedule date
+    - ### SUM
+        ```
+        select sum(is_completed) completed, count(*) - sum(is_completed) incomplete from time_schedule;
+        ```
+        > shows number of completed nad incomplete schedules
+
+- ## Group by and Having
+    ```
+    select event_date, count(*) from time_schedule group by event_date having count(*) > 1;
+    ```
+    > Date with more than 1 schedules
+
+    <img src="images/group_by.png">
+    
+    
+
+
+
+
+
+
+
