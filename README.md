@@ -1,8 +1,7 @@
 # ScheduleManagement
-## Database project
 
 ### DB Schema
-<!-- <img src="images/schema.png" height="400px"> -->
+<img src="images/schema.png">
 
 ## Creating user
 1. ### Connect to system
@@ -126,6 +125,7 @@ drop table time_schedule;
 drop table day_schedule;
 drop table user_table;
 
+-- on server
 create table user_table(
 	user_id varchar(50) primary key,
 	name varchar(30),
@@ -133,6 +133,7 @@ create table user_table(
 	password varchar(20) not null
 );
 
+-- on user side
 create table day_schedule(
 	event_date varchar(10) primary key,
 	time_in_day integer not null,
@@ -143,36 +144,37 @@ create table day_schedule(
 	foreign key(user_id) references user_table(user_id)
 );
 
+-- on user side
 create table time_schedule(
-	ts_midnight integer not null,
+	ts_midnight integer,
 	timestamp_utc integer,
-	message_time varchar(10),
-	message varchar(200),
+	message_time varchar(20),
+	message varchar(50), --change to 200 later
 	upload_time varchar(20),
 	is_completed integer,
-	user_id varchar(50),
 	event_date varchar(10),
-	foreign key(user_id) references user_table(user_id),
 	foreign key(event_date) references day_schedule(event_date),
-	primary key(user_id,timestamp_utc)
-    
-    CONSTRAINT check_mid_utc CHECK (
-        ( is_completed in(0,1) ) and
-        (timestamp_utc > 0) and
-        (ts_midnight > 0)
+	primary key(timestamp_utc),
+	CONSTRAINT check_mid_utc CHECK (
+        is_completed in(0,1)  and
+        ( timestamp_utc > 0 ) and
+        ( ts_midnight > 0 )
     )
 );
 
+-- on server
 create table notification(
 	timestamp_utc integer CHECK (timestamp_utc > 0),
 	user_id varchar(50),
-	message_new varchar(200),
-	message_time varchar(10),
+	message_new varchar(50), --change to 200 later
+	message_time varchar(20),
 	is_completed integer CHECK (is_completed IN (0,1)),
-	foreign key(user_id,timestamp_utc) references time_schedule(user_id,timestamp_utc),	
+	foreign key(user_id) references user_table(user_id),
+	foreign key(timestamp_utc) references time_schedule(timestamp_utc)
+	on delete cascade,
 	primary key(user_id,timestamp_utc)
-    on delete cascade
 );
+
 
 ```
 <hr>
@@ -450,8 +452,8 @@ create table notification(
     ```
     <img src="images/with.png">
 
-- ## Saving output to 
-    Not working in my pc
+<!-- - ## Saving output to 
+    Not working in my pc -->
 
 - ## Aggregate function
     - ### AVG
