@@ -1,7 +1,7 @@
 # ScheduleManagement
 
 ### DB Schema
-<img src="images/schema.png">
+<img src="images/schema_updated.png">
 
 ## Creating user
 1. ### Connect to system
