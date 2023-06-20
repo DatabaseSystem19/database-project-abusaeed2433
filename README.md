@@ -951,5 +951,3 @@ end;
 /
 ```
 > Will update message after any changes in time_schedule table
-
-
