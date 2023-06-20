@@ -193,3 +193,15 @@
             drop function getName;
 ------------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------------
+
+set serveroutput on;
+
+create or replace trigger message_updater
+after update on time_schedule
+referencing old as o new as n
+for each row
+begin
+    update notification set message_new = :n.message where timestamp_utc = :o.timestamp_utc and user_id = 'vH1E5iZ8o7O9MuEqW2BniUShRFq4'; 
+end;
+------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------

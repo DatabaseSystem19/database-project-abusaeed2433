@@ -808,7 +808,6 @@ create table notification(
                 <td>increase size dynamically by one</td>
                 <td>size is defined manually</td>
             <tr>
-
             <tr>
                 <td>need to extend before adding</td>
                 <td>can assign directly</td>
@@ -935,5 +934,22 @@ create table notification(
                 <td>Can be used in SQL statements directly</td>
             <tr>
         </table>
-<hr>
+    </hr>
+    
+- ### Trigger
+> A database trigger is a piece of procedural code that is automatically executed in response to certain events on a table or view in a database. Triggers are typically used to maintain the integrity of the data in the database, or to perform some other action in response to a change in the data.
+```
+set serveroutput on;
+
+create or replace trigger message_updater
+after update on time_schedule
+referencing old as o new as n
+for each row
+begin
+    update notification set message_new = :n.message where timestamp_utc = :o.timestamp_utc and user_id = 'vH1E5iZ8o7O9MuEqW2BniUShRFq4'; 
+end;
+/
+```
+> Will update message after any changes in time_schedule table
+
 
